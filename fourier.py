@@ -17,23 +17,6 @@ def pulseTrain (freq, time, fs = 44100):
 
 def a_n(signal, period, n_harmonic, fs = 44100):
     '''
-
-    Parameters
-    ----------
-    signal : TYPE
-        DESCRIPTION.
-    period : TYPE
-        DESCRIPTION.
-    n_harmonic : TYPE
-        DESCRIPTION.
-    fs : TYPE, optional
-        DESCRIPTION. The default is 44100.
-
-    Returns
-    -------
-    coeff_a : TYPE
-        DESCRIPTION.
-
     '''
     signal = signal[:round(period*fs)]
     vectorT = np.arange(0, len(signal))/fs
@@ -53,21 +36,31 @@ def b_n(signal, period, n_harmonic, fs = 44100):
     
     return coeff_b
 
-def fourierSeries(signal, period, n_harmonics, min_error = 0.1, fs = 44100):
+def fourierSeries(signal, period, stop_at_error = True , max_harmonics = 10, min_error = 0.1, fs = 44100):
     '''
     '''
     time = len(signal)/fs
     vector_t = np.linspace(0, time, round(time*fs))
     fourier_series = 1/2 * a_n(signal, period, 0, fs)
-    for n in range(1, n_harmonics+1):
-          fourier_series += (a_n(signal,period,n,fs) * 
-                                 np.cos((vector_t*n*2*np.pi)/period)
+    
+    if stop_at_error == True :
+        n = 0
+        while msError(signal, fourier_series) > min_error:
+            n += 1
+            fourier_series += (a_n(signal,period,n,fs) * 
+                                   np.cos((vector_t*n*2*np.pi)/period)
                             + b_n(signal,period,n,fs) * 
-                                 np.sin((vector_t*n*2*np.pi)/period))
-          if msError(signal, fourier_series) < min_error:
-              break  
-         
-    return fourier_series
+                                   np.sin((vector_t*n*2*np.pi)/period))
+        
+    elif stop_at_error == False:
+        
+        for n in range(1, max_harmonics+1):
+              fourier_series += (a_n(signal,period,n,fs) * 
+                                     np.cos((vector_t*n*2*np.pi)/period)
+                                + b_n(signal,period,n,fs) * 
+                                     np.sin((vector_t*n*2*np.pi)/period))    
+    
+    return (fourier_series, n)
 
 
 def msError(signal, fourier_series):
@@ -90,18 +83,23 @@ def gibbsCheck(signal, fourier_series):
     else:
         return min_error*100
     
-    
+def dirichletCheck (signal, fs):
+    pass
+
 #-------------------------------TREN DE PULSOS-------------------------------#
 
 # Armado de senal y serie.
 freq = 2
 time = 1
 fs = 44100
-n_harmonics = 50
-min_error = 0.01
+max_harmonics = 500
+min_error = 0.8
+stop_at_error = False
 vector_t = np.linspace(0, time, round(time*fs))
-signal = pulseTrain(freq, time, fs) -1
-fourier_series = fourierSeries(signal, 1/freq, n_harmonics, min_error, fs)
+signal = pulseTrain(freq, time, fs)
+fourier_tuple = fourierSeries(signal, 1/freq, stop_at_error, max_harmonics, min_error, fs)
+n_harmonics = fourier_tuple[1]
+fourier_series = fourier_tuple[0]
 
 # Graficamos
 plt.plot(vector_t, fourier_series,'y')
@@ -109,32 +107,38 @@ plt.plot(vector_t, signal, ',r')
 plt.title('Fourier series of a Train Pulse')
 plt.show()
 
-# Print del Mean Square Error y chequeo de gibbs.
+# Print del chequeo de Dirichlet, Mean Square Error y chequeo de gibbs.
+# dirichlet_check = True
+# print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
 ms_error = msError(signal, fourier_series)
-print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
+print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 2), '%')
 gibbs_check = gibbsCheck(signal, fourier_series) 
-print('El error generado por la discontinuidad es de', round(gibbs_check, 2), '%')
+print('El error generado por la discontinuidad es de', round(gibbs_check), '%')
+error_continous = msError(signal[:round(fs/(freq*2))], fourier_series[:round(fs/(freq*2))]) 
+print('El error generado por la CONTINUIDAD es de', round(error_continous, 2), '%')
 
 #-------------------------------SENAL CONTINUA-------------------------------#
 
-# Armado de senal y serie.
-time = 20
-fs = 44100
-n_harmonics = 9
-min_error = 0.1
-vector_t = np.linspace(-time/2, time/2, round(time*fs))
-signal = np.sinc(vector_t)
-fourier_series = fourierSeries(signal, time, n_harmonics, min_error, fs)
+# # Armado de senal y serie.
+# time = 20
+# fs = 44100
+# n_harmonics = 9
+# min_error = 0.1
+# vector_t = np.linspace(-time/2, time/2, round(time*fs))
+# signal = np.sinc(vector_t)
+# fourier_series = fourierSeries(signal, time, n_harmonics, min_error, fs)
 
-# Graficamos
-plt.plot(vector_t, fourier_series,'y')
-plt.plot(vector_t, signal, ',r')
-plt.title('Fourier series of a Sinc function')
-plt.show()
+# # Graficamos
+# plt.plot(vector_t, fourier_series,'y')
+# plt.plot(vector_t, signal, ',r')
+# plt.title('Fourier series of a Sinc function')
+# plt.show()
 
-# Print del Mean Square Error y chequeo de gibbs.
-ms_error = msError(signal, fourier_series)
-print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
-gibbs_check = gibbsCheck(signal, fourier_series) 
-print('El error maximo es de', round(gibbs_check, 2), '%')
+# # Print del chequeo de Dirichlet, Mean Square Error y chequeo de gibbs.
+# # dirichlet_check = True
+# # print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
+# ms_error = msError(signal, fourier_series)
+# print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
+# gibbs_check = gibbsCheck(signal, fourier_series) 
+# print('El error maximo es de', round(gibbs_check, 2), '%')
 
