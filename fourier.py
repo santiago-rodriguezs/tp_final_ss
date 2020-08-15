@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import square, sawtooth
 
 def pulseTrain (freq, time, fs = 44100):
     '''
@@ -14,6 +13,13 @@ def pulseTrain (freq, time, fs = 44100):
         pulse_train = np.hstack((pulse_train,pulse_train))
     
     return pulse_train[:round(time*fs)]
+
+def sincFunction (arg, time, fs = 44100):
+    '''
+    '''
+    vector_t = np.linspace(-time/2, time/2, round(time*fs))
+    sinc = np.sin(arg*vector_t)/(arg*vector_t)
+    return sinc
 
 def a_n(signal, period, n_harmonic, fs = 44100):
     '''
@@ -88,57 +94,57 @@ def dirichletCheck (signal, fs):
 
 #-------------------------------TREN DE PULSOS-------------------------------#
 
-# Armado de senal y serie.
-freq = 2
-time = 1
-fs = 44100
-max_harmonics = 500
-min_error = 0.8
-stop_at_error = False
-vector_t = np.linspace(0, time, round(time*fs))
-signal = pulseTrain(freq, time, fs)
-fourier_tuple = fourierSeries(signal, 1/freq, stop_at_error, max_harmonics, min_error, fs)
-n_harmonics = fourier_tuple[1]
-fourier_series = fourier_tuple[0]
-
-# Graficamos
-plt.plot(vector_t, fourier_series,'y')
-plt.plot(vector_t, signal, ',r')
-plt.title('Fourier series of a Train Pulse')
-plt.show()
-
-# Print del chequeo de Dirichlet, Mean Square Error y chequeo de gibbs.
-# dirichlet_check = True
-# print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
-ms_error = msError(signal, fourier_series)
-print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 2), '%')
-gibbs_check = gibbsCheck(signal, fourier_series) 
-print('El error generado por la discontinuidad es de', round(gibbs_check), '%')
-error_continous = msError(signal[:round(fs/(freq*2))], fourier_series[:round(fs/(freq*2))]) 
-print('El error generado por la CONTINUIDAD es de', round(error_continous, 2), '%')
-
-#-------------------------------SENAL CONTINUA-------------------------------#
-
 # # Armado de senal y serie.
-# time = 20
+# freq = 2
+# time = 1
 # fs = 44100
-# n_harmonics = 9
-# min_error = 0.1
-# vector_t = np.linspace(-time/2, time/2, round(time*fs))
-# signal = np.sinc(vector_t)
-# fourier_series = fourierSeries(signal, time, n_harmonics, min_error, fs)
+# max_harmonics = 500
+# min_error = 0.8
+# stop_at_error = False
+# vector_t = np.linspace(0, time, round(time*fs))
+# signal = pulseTrain(freq, time, fs)
+# fourier_tuple = fourierSeries(signal, 1/freq, stop_at_error, max_harmonics, min_error, fs)
+# n_harmonics = fourier_tuple[1]
+# fourier_series = fourier_tuple[0]
 
 # # Graficamos
 # plt.plot(vector_t, fourier_series,'y')
 # plt.plot(vector_t, signal, ',r')
-# plt.title('Fourier series of a Sinc function')
+# plt.title('Fourier series of a Train Pulse')
 # plt.show()
 
 # # Print del chequeo de Dirichlet, Mean Square Error y chequeo de gibbs.
-# # dirichlet_check = True
-# # print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
 # ms_error = msError(signal, fourier_series)
-# print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
+# print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 2), '%')
 # gibbs_check = gibbsCheck(signal, fourier_series) 
-# print('El error maximo es de', round(gibbs_check, 2), '%')
+# print('El error generado por la discontinuidad es de', round(gibbs_check), '%')
+# error_continous = msError(signal[:round(fs/(freq*2))], fourier_series[:round(fs/(freq*2))]) 
+# print('El error generado por la CONTINUIDAD es de', round(error_continous, 2), '%')
+
+#-------------------------------SENAL CONTINUA-------------------------------#
+
+# # Armado de senal y serie.
+arg = 3
+time = 10
+fs = 44100
+max_harmonics = 20
+min_error = 1
+stop_at_error = True
+vector_t = np.linspace(-time/2, time/2, round(time*fs))
+signal = sincFunction(arg, time, fs)
+fourier_tuple = fourierSeries(signal, time, stop_at_error, max_harmonics, min_error, fs)
+n_harmonics = fourier_tuple[1]
+fourier_series = fourier_tuple[0]
+
+# Graficamos
+plt.plot(vector_t, fourier_series,'b')
+plt.plot(vector_t, signal, ',r')
+plt.title('Fourier series of a Sinc function')
+plt.show()
+
+# Print del chequeo de Dirichlet, Mean Square Error y chequeo de gibbs.
+ms_error = msError(signal, fourier_series)
+print('El MSE con', n_harmonics, 'armónicos es de: ', round(ms_error, 3), '%')
+gibbs_check = gibbsCheck(signal, fourier_series) 
+print('El error maximo es de', round(gibbs_check, 2), '%')
 
