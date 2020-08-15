@@ -115,12 +115,11 @@ def pulseMainFunction (time, freq, method, value, fs = 44100):
     plt.plot(vector_t, signal, ',r')
     plt.title('Fourier series of a Train Pulse')
     plt.savefig("./static/img/series.png")
+    plt.close()
     
     # Return values
-    if stop_at_error == True:
-        return n_harmonics
-    elif stop_at_error == False:
-        return ms_error
+    return {'n_harmonics':n_harmonics, 'ms_error':ms_error}
+
          
 def sincMainFunction (time, arg, method, value, fs = 44100):
     # Building signal
@@ -144,25 +143,27 @@ def sincMainFunction (time, arg, method, value, fs = 44100):
     plt.plot(vector_t, signal, ',r')
     plt.title('Fourier series of a Sinc function')
     plt.savefig("./static/img/series.png")
-    plt.show()
+    plt.close()
     
-    if stop_at_error == True:
-        return n_harmonics
-    elif stop_at_error == False:
-        return ms_error
+    # Return values
+    return {'n_harmonics':n_harmonics, 'ms_error':ms_error}
 
 #-------------------------------TREN DE PULSOS-------------------------------#
 
 # freq = 2
 # time = 2
-# value = 3
-# stop_at_error = False
-# pulseMainFunction(time, freq, value, stop_at_error)
+# method = "Armónicos [n]"
+# value = 10
+# method = "Error [%]"
+# value = 0.1
+# pulseMainFunction(time, freq, method, value)
 
 #-------------------------------SENAL CONTINUA-------------------------------#
 
-# arg = 3
-# time = 10
-# value = 0.8
-# stop_at_error = True
-# sincMainFunction(time, arg, value, stop_at_error)
+# freq = 2
+# time = 2
+# method = "Armónicos [n]"
+# value = 10
+# method = "Error [%]"
+# value = 0.1
+# sincMainFunction(time, arg, method, value)
