@@ -61,8 +61,7 @@ def fourierSeries(signal, period, stop_at_error, value , fs = 44100):
         
     elif stop_at_error == False:
         max_harmonics = value
-        for i in range(1, max_harmonics+1):
-            n = i
+        for n in range(1, max_harmonics+1):
             fourier_series += (a_n(signal,period,n,fs) * 
                                      np.cos((vector_t*n*2*np.pi)/period)
                                 + b_n(signal,period,n,fs) * 
@@ -106,7 +105,7 @@ def pulseMainFunction (time, freq, value, stop_at_error, fs = 44100):
     plt.plot(vector_t, fourier_series,'y')
     plt.plot(vector_t, signal, ',r')
     plt.title('Fourier series of a Train Pulse')
-    # plt.savefig("./static/img/series.png")
+    plt.savefig("./static/img/series.png")
     
     if stop_at_error == True:
         return n_harmonics
@@ -125,7 +124,7 @@ def sincMainFunction (time, arg, value, stop_at_error, fs = 44100):
     plt.plot(vector_t, fourier_series,'y')
     plt.plot(vector_t, signal, ',r')
     plt.title('Fourier series of a Sinc function')
-    # plt.savefig("./static/img/series.png")
+    plt.savefig("./static/img/series.png")
     plt.show()
     
     if stop_at_error == True:
