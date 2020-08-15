@@ -93,33 +93,52 @@ def gibbsCheck(signal, fourier_series):
 def dirichletCheck (signal, fs):
     pass
 
-def pulseMainFunction (time, freq, value, stop_at_error, fs = 44100):
-    # Building signal and Fourier series
+def pulseMainFunction (time, freq, method, value, fs = 44100):
+    # Building signal
     vector_t = np.linspace(0, time, round(time*fs))
     signal = pulseTrain(freq, time, fs)
+    
+    # Choosing method
+    if method == 'Error [%]':
+        stop_at_error = True
+    elif method == 'Armónicos [n]':
+        stop_at_error = False
+    
+    # Building Fourier Series
     fourier_tuple = fourierSeries(signal, 1/freq, stop_at_error, value, fs)
     fourier_series = fourier_tuple[0]
     n_harmonics = fourier_tuple[1]
     ms_error = fourier_tuple[2]
+   
     # Plotting
     plt.plot(vector_t, fourier_series,'y')
     plt.plot(vector_t, signal, ',r')
     plt.title('Fourier series of a Train Pulse')
     plt.savefig("./static/img/series.png")
     
+    # Return values
     if stop_at_error == True:
         return n_harmonics
     elif stop_at_error == False:
         return ms_error
          
-def sincMainFunction (time, arg, value, stop_at_error, fs = 44100):
-    # Building signal and Fourier series
+def sincMainFunction (time, arg, method, value, fs = 44100):
+    # Building signal
     vector_t = np.linspace(-time/2, time/2, round(time*fs))    
     signal = sincFunction(arg, time, fs)
+    
+    # Choosing method
+    if method == 'Error [%]':
+        stop_at_error = True
+    elif method == 'Armónicos [n]':
+        stop_at_error = False
+    
+    # Building Fourier Series
     fourier_tuple = fourierSeries(signal, time, stop_at_error, value, fs)
     fourier_series = fourier_tuple[0]
     n_harmonics = fourier_tuple[1]
     ms_error = fourier_tuple[2]
+    
     # Plotting
     plt.plot(vector_t, fourier_series,'y')
     plt.plot(vector_t, signal, ',r')
