@@ -105,18 +105,19 @@ def pulseMainFunction (time, freq, method, value, fs = 44100):
     elif method == 'Armónicos [n]':
         stop_at_error = False
         value = int(value)
-        value = value * 2
+        value = value 
     
     # Building Fourier Series
     fourier_tuple = fourierSeries(signal, 1/freq, stop_at_error, value, fs)
     fourier_series = fourier_tuple[0]
     n_harmonics = fourier_tuple[1]
     ms_error = fourier_tuple[2]
+    gibbs = gibbsCheck(signal, fourier_series)
     
     if ((1/2*freq) > time ):
         msg = "La señal representada es una constante, no un tren de pulsos. Para corregir esto ingrese un valor de tiempo mayor a la mitad del período."
     else:
-        msg = "Porcentaje de Gibbs: 18%"
+        msg = "Porcentaje de Gibbs: " + str(gibbs) + "%" 
    
     # Plotting
     plt.plot(vector_t, fourier_series,'y', label='Serie de Fourier')
@@ -133,7 +134,7 @@ def pulseMainFunction (time, freq, method, value, fs = 44100):
     plt.close()
     
     # Return values
-    return {"harmonics": round(n_harmonics/2), "error": round(ms_error, 4), "msg": msg}
+    return {"harmonics": round(n_harmonics), "error": round(ms_error, 4), "msg": msg, "gibbs": gibbs}
 
          
 def sincMainFunction (time, arg, method, value, fs = 44100):
